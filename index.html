@@ -201,21 +201,65 @@ async function driveFetch(url,opts={}){
  return r.status===204?null:r.json();
 }
 function ensureDrive(){if(driveAccessToken)return true;googleSignIn();alert('Sign in to Google, then click the action again.');return false}
-async function getRatanBhabanFolder(){
- const cached=localStorage.getItem('ratanBhabanDriveFolderId');
- if(cached)return cached;
- const q="name='Ratan Bhaban App' and mimeType='application/vnd.google-apps.folder' and trashed=false";
- const found=await driveFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&pageSize=100&fields=files(id,name,mimeType)');
- let folder=(found.files||[])[0];
- if(!folder){
-  folder=await driveFetch('https://www.googleapis.com/drive/v3/files?fields=id,name',{
-   method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({name:'Ratan Bhaban App',mimeType:'application/vnd.google-apps.folder'})
-  });
- }
- if(!folder?.id)throw new Error('Could not find or create the Ratan Bhaban Drive folder.');
- localStorage.setItem('ratanBhabanDriveFolderId',folder.id);
- return folder.id;
+async function getRatanBhabanFolder() {
+  const folderName = 'Ratan Bhaban App';
+  let folderId = localStorage.getItem('ratanBhabanDriveFolderId');
+
+  // Validate previously saved folder ID
+  if (folderId) {
+    try {
+      const folder = await driveFetch(
+        'https://www.googleapis.com/drive/v3/files/' +
+        encodeURIComponent(folderId) +
+        '?fields=id,name,mimeType,trashed'
+      );
+
+      if (
+        folder.id &&
+        folder.mimeType === 'application/vnd.google-apps.folder' &&
+        !folder.trashed
+      ) {
+        return folder.id;
+      }
+    } catch (error) {
+      localStorage.removeItem('ratanBhabanDriveFolderId');
+      folderId = null;
+    }
+  }
+
+  // Search for Ratan Bhaban App folder
+  const q = "name='Ratan Bhaban App' and mimeType='application/vnd.google-apps.folder' and trashed=false";
+
+  const found = await driveFetch(
+    'https://www.googleapis.com/drive/v3/files?q=' +
+    encodeURIComponent(q) +
+    '&pageSize=100&fields=files(id,name,mimeType)'
+  );
+
+  let folder = (found.files || [])[0];
+
+  // Create folder if not found
+  if (!folder) {
+    folder = await driveFetch(
+      'https://www.googleapis.com/drive/v3/files?fields=id,name',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: folderName,
+          mimeType: 'application/vnd.google-apps.folder'
+        })
+      }
+    );
+  }
+
+  if (!folder || !folder.id) {
+    throw new Error('Could not create Ratan Bhaban App folder.');
+  }
+
+  localStorage.setItem('ratanBhabanDriveFolderId', folder.id);
+
+  return folder.id;
 }
 async function saveToDrive(){
  if(!ensureDrive())return;

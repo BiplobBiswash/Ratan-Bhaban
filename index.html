@@ -104,12 +104,18 @@ function yearlyExpenses(y){
 function closingBalance(y){
  const years=availableYears().filter(v=>v<=y).sort((a,b)=>a-b);
  let balance=0;
+
  for(const yr of years){
-  const rent=yearlyRent(yr),expense=yearlyExpenses(yr);
-  balance+=(rent===null?0:rent)-(expense===null?0:expense);
+  const rent=yearlyRent(yr) ?? 0;
+  const expense=yearlyExpenses(yr) ?? 0;
+  const bankNet=yearlyBankNet(yr) ?? 0;
+
+  balance += rent-(expense+bankNet);
  }
+
  return balance;
 }
+
 function yearlyBankNet(y){const items=(db.banks||[]).filter(x=>bankYear(x.date)===y);return items.length?sum(items.map(x=>x.deposit))-sum(items.map(x=>x.withdraw)):null}
 function setupYearSelectors(){
  const years=availableYears();

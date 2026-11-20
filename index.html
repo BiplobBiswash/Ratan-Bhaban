@@ -287,9 +287,9 @@ async function restoreFromDrive(){
   driveStatus('Finding Ratan Bhaban folder…');
   const folderId=await getRatanBhabanFolder();
   driveStatus('Loading backups from Ratan Bhaban App folder…');
-  const q="'"+folderId+"' in parents and trashed=false and name contains 'Ratan Bhaban Backup'";
+  const q="'"+folderId+"' in parents and trashed=false and name contains 'Ratan Bhaban App Backup'";
   const x=await driveFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&orderBy=createdTime desc&pageSize=50&fields=files(id,name,createdTime)');
-  const files=x.files||[];if(!files.length){alert('No Ratan Bhaban backups found in the Ratan Bhaban folder.');driveStatus('No backups found');return}
+  const files=x.files||[];if(!files.length){alert('No Ratan Bhaban backups found in the Ratan Bhaban App folder.');driveStatus('No backups found');return}
   const menu=files.map((f,i)=>(i+1)+'. '+f.name+' — '+new Date(f.createdTime).toLocaleString()).join('\n');
   const n=prompt('Select backup number to restore from Ratan Bhaban folder:\n\n'+menu+'\n\nEnter number:','1');
   if(n===null)return;const i=Number(n)-1;if(!Number.isInteger(i)||i<0||i>=files.length){alert('Invalid selection');return}
@@ -297,7 +297,7 @@ async function restoreFromDrive(){
   const backup=await driveFetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(files[i].id)+'?alt=media');
   if(!backup.tenants||!backup.expenses||!backup.banks)throw new Error('Invalid Ratan Bhaban backup file');
   db=backup;(db.tenants||[]).forEach(t=>{if(!Array.isArray(t.rentDates))t.rentDates=Array(12).fill('');if(!t.rentsByYear)t.rentsByYear={[String(Number(db.year)||2026)]:Array.isArray(t.rents)?t.rents.slice():Array(12).fill(null)};if(!t.rentDatesByYear)t.rentDatesByYear={[String(Number(db.year)||2026)]:t.rentDates.slice()};});(db.expenses||[]).forEach(x=>{if(!x.year)x.year=Number(db.year)||2026});
-  save();driveStatus('Restored from Ratan Bhaban folder');alert('Backup restored successfully from Google Drive → Ratan Bhaban.');
+  save();driveStatus('Restored from Ratan Bhaban folder');alert('Backup restored successfully from Google Drive → Ratan Bhaban App.');
  }catch(e){driveStatus('Restore failed');alert(e.message)}
 }
 

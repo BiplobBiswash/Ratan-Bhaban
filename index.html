@@ -284,7 +284,7 @@ async function saveToDrive(){
 async function restoreFromDrive(){
  if(!ensureDrive())return;
  try{
-  driveStatus('Finding Ratan Bhaban folder…');
+  driveStatus('Finding Ratan Bhaban App folder…');
   const folderId=await getRatanBhabanFolder();
   driveStatus('Loading backups from Ratan Bhaban App folder…');
   const q="'"+folderId+"' in parents and trashed=false and name contains 'Ratan Bhaban App Backup'";

@@ -228,7 +228,7 @@ async function saveToDrive(){
   const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(metadata)+'\r\n--'+boundary+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(db,null,2)+'\r\n--'+boundary+'--';
   await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,parents',{
    method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body});
-  driveStatus('Backup saved in Ratan Bhaban folder');alert('Backup saved successfully in Google Drive → Ratan Bhaban.');
+  driveStatus('Backup saved in Ratan Bhaban App folder');alert('Backup saved successfully in Google Drive → Ratan Bhaban App.');
  }catch(e){driveStatus('Save failed');alert(e.message)}
 }
 async function restoreFromDrive(){
@@ -236,7 +236,7 @@ async function restoreFromDrive(){
  try{
   driveStatus('Finding Ratan Bhaban folder…');
   const folderId=await getRatanBhabanFolder();
-  driveStatus('Loading backups from Ratan Bhaban folder…');
+  driveStatus('Loading backups from Ratan Bhaban App folder…');
   const q="'"+folderId+"' in parents and trashed=false and name contains 'Ratan Bhaban Backup'";
   const x=await driveFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&orderBy=createdTime desc&pageSize=50&fields=files(id,name,createdTime)');
   const files=x.files||[];if(!files.length){alert('No Ratan Bhaban backups found in the Ratan Bhaban folder.');driveStatus('No backups found');return}

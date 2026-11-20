@@ -204,7 +204,7 @@ function ensureDrive(){if(driveAccessToken)return true;googleSignIn();alert('Sig
 async function getRatanBhabanFolder(){
  const cached=localStorage.getItem('ratanBhabanDriveFolderId');
  if(cached)return cached;
- const q="name='Ratan Bhaban' and mimeType='application/vnd.google-apps.folder' and trashed=false";
+ const q="name='Ratan Bhaban App' and mimeType='application/vnd.google-apps.folder' and trashed=false";
  const found=await driveFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&pageSize=100&fields=files(id,name,mimeType)');
  let folder=(found.files||[])[0];
  if(!folder){
